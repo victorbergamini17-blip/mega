@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conferidor Mega-Sena Pro</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #e8f5e9; padding: 20px; display: flex; justify-content: center; }
+        .card { background: white; padding: 25px; border-radius: 15px; max-width: 450px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 8px solid #204322; }
+        h2 { color: #204322; margin-bottom: 15px; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; font-size: 0.9em; color: #666; margin-bottom: 5px; }
+        input[type="number"], input[type="text"] { padding: 10px; border: 1px solid #ccc; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        .sorteados-container { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 20px; }
+        .sorteados-container input { text-align: center; font-weight: bold; font-size: 1.1em; color: #204322; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1em; transition: 0.3s; margin-top: 10px; }
+        .btn-check { background: #204322; color: white; }
+        .btn-check:hover { background: #2e5d31; }
+        .btn-whatsapp { background: #25d366; color: white; display: none; }
+        .btn-whatsapp:hover { background: #1ebd5a; }
+        .resultado { margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 10px; border-left: 5px solid #204322; display: none; text-align: left; }
+        .jogo-item { padding: 8px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        .badge { background: #204322; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🍀 Mega-Sena</h2>
+    
+    <div style="display: flex; gap: 10px;">
+        <div class="input-group" style="flex: 1;">
+            <label>Nº do Concurso</label>
+            <input type="number" id="concurso" placeholder="Ex: 2800">
+        </div>
+        <div class="input-group" style="flex: 1;">
+            <label>Restantes</label>
+            <input type="number" id="restantes" value="12">
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Valor do Prêmio (R$)</label>
+        <input type="text" id="premio" placeholder="Ex: 45.000.000,00">
+    </div>
+
+    <div class="input-group">
+        <label>Números Sorteados</label>
+        <div class="sorteados-container">
+            <input type="number" id="s1" min="1" max="60">
+            <input type="number" id="s2" min="1" max="60">
+            <input type="number" id="s3" min="1" max="60">
+            <input type="number" id="s4" min="1" max="60">
+            <input type="number" id="s5" min="1" max="60">
+            <input type="number" id="s6" min="1" max="60">
+        </div>
+    </div>
+
+    <button class="btn-check" onclick="conferir()">CONFERIR AGORA</button>
+    
+    <div id="resultado-box" class="resultado">
+        <div id="lista-acertos"></div>
+        <button class="btn-whatsapp" id="btn-wa" onclick="copiarWhatsApp()">Copiar para WhatsApp 📱</button>
+    </div>
+</div>
+
+<script>
+const meusJogos = [
+    [17, 23, 36, 37, 45, 53],
+    [05, 10, 27, 37, 40, 58],
+    [11, 19, 25, 33, 45, 46],
+    [10, 13, 23, 24, 34, 53],
+    [01, 06, 14, 17, 24, 57]
+];
+
+function conferir() {
+    const sorteados = [
+        parseInt(document.getElementById('s1').value),
+        parseInt(document.getElementById('s2').value),
+        parseInt(document.getElementById('s3').value),
+        parseInt(document.getElementById('s4').value),
+        parseInt(document.getElementById('s5').value),
+        parseInt(document.getElementById('s6').value)
+    ].filter(n => !isNaN(n));
+
+    if (sorteados.length < 6) {
+        alert("Por favor, preencha os 6 números sorteados.");
+        return;
+    }
+
+    let html = "";
+    meusJogos.forEach((jogo, i) => {
+        let acertos = jogo.filter(n => sorteados.includes(n)).length;
+        html += `<div class="jogo-item"><span>Jogo ${i+1}</span> <span class="badge">${acertos} acertos</span></div>`;
+    });
+
+    document.getElementById('lista-acertos').innerHTML = html;
+    document.getElementById('resultado-box').style.display = 'block';
+    document.getElementById('btn-wa').style.display = 'block';
+}
+
+function copiarWhatsApp() {
+    const conc = document.getElementById('concurso').value || "---";
+    const prem = document.getElementById('premio').value || "---";
+    const rest = document.getElementById('restantes').value;
+    const sorteados = [
+        document.getElementById('s1').value, document.getElementById('s2').value,
+        document.getElementById('s3').value, document.getElementById('s4').value,
+        document.getElementById('s5').value, document.getElementById('s6').value
+    ].join(" ");
+
+    let texto = `🍀 *RESUMO MEGA-SENA*\n`;
+    texto += `🔢 *Concurso:* ${conc}\n`;
+    texto += `💰 *Prêmio:* R$ ${prem}\n`;
+    texto += `✨ *Resultado:* ${sorteados}\n`;
+    texto += `--------------------------\n`;
+
+    meusJogos.forEach((jogo, i) => {
+        let acertos = jogo.filter(n => {
+            return [
+                parseInt(document.getElementById('s1').value),
+                parseInt(document.getElementById('s2').value),
+                parseInt(document.getElementById('s3').value),
+                parseInt(document.getElementById('s4').value),
+                parseInt(document.getElementById('s5').value),
+                parseInt(document.getElementById('s6').value)
+            ].includes(n);
+        }).length;
+        texto += `✅ Jogo ${i+1}: ${acertos} acertos\n`;
+    });
+
+    texto += `--------------------------\n`;
+    texto += `⏳ *Sorteios restantes:* ${rest}`;
+
+    navigator.clipboard.writeText(texto).then(() => {
+        alert("Resumo copiado! Agora é só colar no WhatsApp.");
+    });
+}
+</script>
+
+</body>
+</html>

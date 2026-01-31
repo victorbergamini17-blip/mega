@@ -1,2 +1,0 @@
-# mega
-Conferidor da Mega
